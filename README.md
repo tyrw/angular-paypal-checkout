@@ -12,4 +12,4 @@ But you can use a different format as needed.  The important thing is to **not**
 
 With that said, you can use the PayPal button like so:
 
-    <ee-paypal-button></ee-paypal-button>
+    <paypal-checkout></paypal-checkout>
