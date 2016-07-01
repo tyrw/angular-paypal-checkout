@@ -13,3 +13,5 @@ But you can use a different format as needed.  The important thing is to **not**
 With that said, you can use the PayPal button like so:
 
     <paypal-checkout></paypal-checkout>
+    
+PayPal's docs aren't the best, but they may help with issues: https://developer.paypal.com/docs/classic/express-checkout/in-context/integration/
