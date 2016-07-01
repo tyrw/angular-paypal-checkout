@@ -1,6 +1,8 @@
 # angular-paypal-checkout
 Angular 1.x directive for running PayPal's in-context checkout flow
 
+![PayPal Checkout Button](https://www.paypalobjects.com/webstatic/en_US/i/buttons/checkout-logo-medium.png)
+
 Your server should receive the client's request, communicate with PayPal, and return the `approval_url`.  For this directive, my server essentially does the following
 
     paypal.payment.createAsync dataObj
