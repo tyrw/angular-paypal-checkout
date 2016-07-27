@@ -7,14 +7,12 @@ module.directive("paypalCheckout", function($http, $q, $timeout) {
     restrict: 'EA',
     scope: {},
     link: function(scope, ele, attrs) {
-      var environment = 'sandbox' // CHANGE AS NEEDED
-      var merchantId = '6XF3MPZBZV6HU' // YOUR MERCHANT ID HERE (or import with scope)
-      var dataToYourServer = { foo: 'bar' } // YOUR DATA HERE (or import with scope)
-      var urlToYourServer = 'http://foo.bar' // YOUR SERVER HERE (or import with scope)
+      var environment = 'sandbox'       // CHANGE AS NEEDED
+      var merchantId  = '6XF3MPZBZV6HU' // YOUR MERCHANT ID HERE (or import with scope)
       var req = {
         method: 'POST',
-        url: urlToYourServer,
-        data: dataToYourServer
+        url: 'http://foo.bar',          // YOUR SERVER HERE (or import with scope)
+        data: { foo: 'bar' }            // YOUR DATA HERE (or import with scope)
       }
       scope.showButton = false
 
@@ -48,6 +46,7 @@ module.directive("paypalCheckout", function($http, $q, $timeout) {
       }
 
       scope.initPaypal = function() {
+        if (scope.showButton == false) { return }
         paypal.checkout.initXO()
         return sendRequest(req)
           .then(function(res) {
