@@ -1,20 +1,22 @@
-'use strict';
-var module = angular.module('paypal-checkout', []);
+'use strict'
+var module = angular.module('paypal-checkout', [])
 
-module.directive("paypalCheckout", function($http, $q) {
+module.directive("paypalCheckout", function($http, $q, $timeout) {
   return {
-    templateUrl: 'components/paypal-checkout.html',
+    templateUrl: 'paypal-checkout.html',
     restrict: 'EA',
     scope: {},
     link: function(scope, ele, attrs) {
+      var environment = 'sandbox' // CHANGE AS NEEDED
       var merchantId = '6XF3MPZBZV6HU' // YOUR MERCHANT ID HERE (or import with scope)
-      var dataToYourServer = {} // YOUR DATA HERE (or import with scope)
+      var dataToYourServer = { foo: 'bar' } // YOUR DATA HERE (or import with scope)
       var urlToYourServer = 'http://foo.bar' // YOUR SERVER HERE (or import with scope)
       var req = {
         method: 'POST',
         url: urlToYourServer,
         data: dataToYourServer
       }
+      scope.showButton = false
 
       function sendRequest(data) {
         var deferred = $q.defer()
@@ -27,15 +29,26 @@ module.directive("paypalCheckout", function($http, $q) {
           })
         return deferred.promise
       }
-      
+
+      function showButton() {
+        scope.showButton = true
+        scope.$apply()
+      }
+
+      function delayAndShowButton() {
+        $timeout(showButton, 1000)
+      }
+
       function loadPaypalButton() {
-        return paypal.checkout.setup(merchantId, {
-          environment: 'sandbox',
+        paypal.checkout.setup(merchantId, {
+          environment: environment,
           buttons: [{ container: 't1', shape: 'rect', size: 'medium' }]
         })
+        delayAndShowButton()
       }
-      
+
       scope.initPaypal = function() {
+        paypal.checkout.initXO()
         return sendRequest(req)
           .then(function(res) {
             return paypal.checkout.startFlow(res.href)
@@ -45,9 +58,9 @@ module.directive("paypalCheckout", function($http, $q) {
             return paypal.checkout.closeFlow()
           })
       }
-      
+
       if (window.paypalCheckoutReady != null) {
-        loadPaypalButton()
+        scope.showButton = true
       } else {
         var s = document.createElement('script')
         s.src = '//www.paypalobjects.com/api/checkout.js'
@@ -56,6 +69,7 @@ module.directive("paypalCheckout", function($http, $q) {
           return loadPaypalButton()
         }
       }
+
     }
   }
 })
