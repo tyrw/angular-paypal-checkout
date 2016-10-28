@@ -16,6 +16,21 @@ But you can use a different format as needed.  The important thing is to **not**
 
 With that said, you can use the PayPal button like so:
 
-    <paypal-checkout></paypal-checkout>
+    <!-- in your view -->
+    <paypal-checkout info="paypalInfo"></paypal-checkout>
+    
+    // in your controller
+    $scope.paypalInfo = {
+      merchantId: 'ASD123WXZLD',
+      environment: 'sandbox',
+      // this function returns a promise that resolves to the paypal approval url
+      // calling your server function (se the example above)
+      url: function(){
+                return api.createPayment();
+           }
+    };
+    
+    // in your app configuration
+    angular.module('myApp', ['paypal-checkout']);
 
 PayPal's docs aren't the best, but they may help with issues: https://developer.paypal.com/docs/classic/express-checkout/in-context/integration/
