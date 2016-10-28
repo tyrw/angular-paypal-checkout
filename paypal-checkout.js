@@ -3,7 +3,7 @@
   'use strict';
 
   angular.module('paypal-checkout', [])
-    .directive('paypalCheckout', function($http, $timeout) {
+    .directive('paypalCheckout', function($timeout) {
       return {
         templateUrl: 'paypal-checkout.html',
         restrict: 'EA',
