@@ -1,74 +1,63 @@
-'use strict'
-var module = angular.module('paypal-checkout', [])
+(function() {
+  /* globals paypal */
+  'use strict';
 
-module.directive("paypalCheckout", function($http, $q, $timeout) {
-  return {
-    templateUrl: 'paypal-checkout.html',
-    restrict: 'EA',
-    scope: {},
-    link: function(scope, ele, attrs) {
-      var environment = 'sandbox'       // CHANGE AS NEEDED
-      var merchantId  = '6XF3MPZBZV6HU' // YOUR MERCHANT ID HERE (or import with scope)
-      var req = {
-        method: 'POST',
-        url: 'http://foo.bar',          // YOUR SERVER HERE (or import with scope)
-        data: { foo: 'bar' }            // YOUR DATA HERE (or import with scope)
-      }
-      scope.showButton = false
+  angular
+    .module('paypal-checkout', [])
+    .directive('paypalCheckout', paypalCheckout);
 
-      function sendRequest(data) {
-        var deferred = $q.defer()
-        $http(data)
-          .success(function(data, status) {
-            return deferred.resolve(data)
-          }).error(function(data, status) {
-            if (status === 0) { data = 'Connection error' }
-            return deferred.reject(data)
-          })
-        return deferred.promise
-      }
+  function paypalCheckout($timeout) {
+    return {
+      templateUrl: 'paypal-checkout.html',
+      restrict: 'EA',
+      scope: {
+        info: '=info'
+      },
+      link: function(scope) {
 
-      function showButton() {
-        scope.showButton = true
-        scope.$apply()
-      }
+        scope.showButton = false;
 
-      function delayAndShowButton() {
-        $timeout(showButton, 1000)
-      }
+        function showButton() {
+          scope.showButton = true;
+          scope.$apply();
+        }
 
-      function loadPaypalButton() {
-        paypal.checkout.setup(merchantId, {
-          environment: environment,
-          buttons: [{ container: 't1', shape: 'rect', size: 'medium' }]
-        })
-        delayAndShowButton()
-      }
+        function delayAndShowButton() {
+          $timeout(showButton, 1000);
+        }
 
-      scope.initPaypal = function() {
-        if (scope.showButton == false) { return }
-        paypal.checkout.initXO()
-        return sendRequest(req)
-          .then(function(res) {
-            return paypal.checkout.startFlow(res.href)
-          })
-          .catch(function(err) {
-            console.log('Problem with checkout flow', err)
-            return paypal.checkout.closeFlow()
-          })
-      }
+        function loadPaypalButton() {
+          paypal.checkout.setup(scope.info.merchantId, {
+            environment: scope.info.environment,
+            buttons: [{ container: 't1', shape: 'rect', size: 'medium' }]
+          });
+          delayAndShowButton();
+        }
 
-      if (window.paypalCheckoutReady != null) {
-        scope.showButton = true
-      } else {
-        var s = document.createElement('script')
-        s.src = '//www.paypalobjects.com/api/checkout.js'
-        document.body.appendChild(s)
-        window.paypalCheckoutReady = function() {
-          return loadPaypalButton()
+        scope.initPaypal = function() {
+          if (scope.showButton === false) { return; }
+          paypal.checkout.initXO();
+          return scope.info.url()
+            .then(function(url) {
+              return paypal.checkout.startFlow(url);
+            })
+            .catch(function(err) {
+              console.log('Problem with checkout flow', err);
+              return paypal.checkout.closeFlow();
+            });
+        };
+
+        if (!!window.paypalCheckoutReady) {
+          scope.showButton = true;
+        } else {
+          var s = document.createElement('script');
+          s.src = '//www.paypalobjects.com/api/checkout.js';
+          document.body.appendChild(s);
+          window.paypalCheckoutReady = function() {
+            return loadPaypalButton();
+          };
         }
       }
-
     }
   }
-})
+})();
